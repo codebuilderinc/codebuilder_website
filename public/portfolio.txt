@@ -1,0 +1,58 @@
+Major Projects I've Worked on:
+* FACS.org - American College of Surgeons National Surgical Quality Improvement Program Learning Management System & Continuing Education & Accreditation testing system.
+* ACS BSCN - American college of Surgeions Bariatric Surgeons Centers Network Learning Management System & Continuing Education & Accreditation testing.
+* Defense Health Agency / Vaccine Healthcare Centers Networks - Learning Management Systems & Continuing Education & Accreditation testing / certificate distribution.
+* CDC / You Call The Shots - CDC web based Learning Management System Courseware & Continuing Education & Accreditation testing / certificate distribution.
+* UNESCAP.org - United Nations / UNESCAP  - Content Management System & Blog (Informational Website).
+* CodeBuilder.us - My Software Consulting LLC website.
+* corbin.world - My Personal information website
+* subtlefu.ge - A dashboard for my friends & family self-hosted services.
+* BitNation.com - My first major project, a private torrent tracker w/ ~100,000 members. (defunct)
+* 123Moviesfun.is - Movie & TV show streaming database.
+* OrangeCountyBarAssociation.org - Orlando, FL Attorney Bar Association Membership website.
+* DDNA.org - Developmentally Disabled Nurses Association membership & Learning Management System website.
+* healthsoftonline.com - Vaccine related Learning Management System & Continuing Education provider. (defunt)
+* parkitfor.me - Domain Name Parking & Expiration Bot SaaS.
+* fuge.it - File Storage SaaS & Web-based Seedbox torrent client System (defunct)
+* TaxCourseCentral.com - Learning Management System Courseware & Accreditation Certificates for tax professionals.
+* GreatLyfe - San Francisco based Wellness & Fitness SaaS startup. (defunct)
+* KYBAProject.com - Boating Community Theft Tracking Database & Membership community.
+* OnPeridot.com - Cannabis Industry eCommerce plaltform (similar to Shopify).
+* NutFlix.com - Mobile-focused (PWA) Porn Video Sharing Community.
+
+Skillset Overview:
+* Full-Stack Dev (Backend) - I have extensive experience with building full-stack web applications. I have a particular affinity for PHP / Laravel (LAMP/LEMP) when it comes to building a full-stack project, but I also have experience with many different libraries, frameworks, and languages. I know how to build proper RESTful API's, how to setup & configure http daemons (apache, nginx, etc..), database engines, and have a solid understanding of the entire http network stack. I know how to build & configure backend web applications from top to bottom and I'm very proficient in regards to server administration / DevOps capabilties in general.
+
+* Full-Stack Dev (Frontend) - I have been building frontend user interfaces since the days of Internet Explorer 6 (ahhh!) and jQuery. Fortunately things have come a long way, and I now have experience with Angular, Vue, React, AlpineJS, and much more. I have a solid understanding of NodeJS and how to use it on the frontend & backend included. More recently I have been working with Svelte & SvelteKit, and I am particularly interested in using it to build a "Mono-stack" which allows me to build a frontend codebase once, and then have it work as a Single Page App(SPA), a Server Side Rendered app (for better SEO), and even the ability to deploy to native codebases. I have also been diving into InertiaJS, NextJS, and NuxtJS for similar reasons. I also have a solid understanding of CSS and know how to setup build processes for all of my frontend code. I have been working with Bootstrap for over a decade at this point, but I have recently come to love TailwindCSS & similar template frameworks such as WindiCSS.
+
+* Responsive Design - I have a great deal of experience building responsive interfaces that function well on desktop & mobile devices. I have built many Single Page Applications, Progressive Web Apps, and also a few 'Native' mobile applications on iOS & Android using wrapper frameworks such as PhoneGap, Ionic, Expo, etc... I have experience tapping into native hardware API's & functionality such as push notifications, biometric hardware, camera & audio, gyroscope, etc... I have some experience with Java and Objective-C (and a tiny bit of Swift) when it comes to Android and iOS native apps. I have also worked with frameworks such as React-Native, Framework7, and various other native mobile-UI focused toolsets.
+
+* Netsec & Penetration Audits - I have experience with various tools & methods to search for vulnerabilities, exploits, and attack vectors in remote systems. I have experience in analyzing systems that have already been exploited and know what to look for when trying to determine how an attack occurred. I also have experience in implementing various tools & techniques to harden the security of a system.
+
+* Database Design, Querying, & Optimization. - I have extensive experience designing relational databases from the ground up. I understand how to structure new databases in order to scale properly, and also how to analyize existing ones to find bottlenecks. I know how to build structured queries, how to build more complex queries for data analaysis, as well as refactoring existing queries to be more performant. I have experience with very large databases, and I understand how and when to implement caching mechanisms, asynchronous processing, and various other optimizations. 
+
+* Horizontal Scaling - I have experience building apps & processes that can scale. I know how to find bottlenecks, and how to break them down into synchronous & asycnhronous workloads that can be spread out across numerous servers, or even offloaded to a client's browser when appropriate. I know how to avoid premature optimization, but also how to avoid creating something that will become a big headache down the line. 
+
+
+Miscellanous things I have experience with:
+* Search Engine Optimization techniques & Tooling (website analysis / audit, tracking metrics, etc...)
+* eCommerce systems, PCI compliance, ACID record keeping, etc...
+* IRC servers (Unrealircd, inspircd, Anope, etc...)
+* Matrix Server (Synapse)
+* Chat bots for IRC, Matrix, Telegram, and Discord (and cross-network bridging)
+* gFTPD Topsite (Distributed ftp) & Pre-DB.
+* Torrent auto-uploader & irc #tracer channel
+* Webtorrent & libp2p related file sharing & realtime communication.
+* Bitcoin, Ethereum, & Binance daemon CLI blockchain tools (bitcoind, geth, web3, etc...)
+* Ethereum Sniping Bot (decoding & building smart contracts)
+* Statistical Analysis & Data Visualization (db querying, graph tooling, web based visual & interactive delivery)
+* Reddit, Facebok, Twitter, Instagram API's & bots (codebulder jobbit bot, cross-posting bots, comment bot etc...)
+* 3rd-party API's & dynamic HTML content parsing bots.
+
+
+Language & Tools:
+* Backend: PHP (Symfony, Laravel, CakePHP, WordPress, etc..), Python (Django, pip, numpy, cython, etc..), NodeJS, Bash Scripting, C++, Java, Ruby/Rails
+* Frontend: JavaScript, jQuery, React, Vue, Svelte, Alpine.js, Livewire, Webpack, Rollup, SCSS, Bootstrap, Tailwind
+* PWA Tools: PhoneGap, Ionic, Expo, Electron
+* Databases: MySQL/MariaDB, PostgreSQL, MongoDB, Memcached, Redis, ElasticSearch,
+* DevOps: Debian, nginx, Apache, Docker, SSH, CertBot/LE, systemd, crontab, process threading, Filesystem tools(sshfs, partitions, RAID, etc..) Network tools (fail2ban, ufw, traceroute, wireshark, iptraf, netstat, etc..)

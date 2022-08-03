@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+  <head>
+    <title>Signal2HTML &middot; Amal</title>
+    <style>
+
+      body {
+        background-color: #222;
+      }
+
+      #message-header {
+        text-align: center;
+        color: white;
+        font-family: Noto Sans, Liberation Sans, OpenSans, sans-serif;
+        padding-top: 30px;
+        padding-bottom: 30px;
+      }
+
+      #thread-title {
+        font-size: x-large;
+      }
+
+      .message-box {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        margin: 0 auto;
+        padding-left: 30px;
+        padding-right: 30px;
+        background-color: #282828;
+        color: white;
+        font-family: Noto Sans, Liberation Sans, OpenSans, sans-serif;
+        border-radius: 10px;
+      }
+
+      .msg-incoming {
+        align-self: flex-start;
+        background: teal;
+      }
+
+      .msg-sender-0 { /* recipient id:   430 */ background: #746C53;}
+
+
+      .msg-outgoing {
+        align-self: flex-end;
+        background: #555;
+      }
+
+      .msg {
+        max-width: 50%;
+        border-radius: .4em;
+        margin: 15px 0;
+        padding: 10px;
+      }
+
+      .msg pre {
+        font-family: Noto Sans, Liberation Sans, OpenSans, sans-serif;
+        white-space: pre-wrap;
+        margin-top: 0px;
+        margin-bottom: 5px;
+      }
+
+      .msg pre a {
+        color: white;
+        text-decoration: underline;
+      }
+
+      .msg-data {
+        font-size: x-small;
+        opacity: 50%;
+        display: block;
+      }
+
+      .msg-emoji {
+        font-family: Noto Color Emoji, sans-serif;
+      }
+
+      .msg-all-emoji {
+        font-size: xx-large;
+      }
+
+      .msg-mention {
+        background-color: #00000060;
+      }
+
+      .msg-date-change {
+        font-size: x-small;
+        opacity: 50%;
+        align-self: center;
+      }
+
+      .msg-dl-link a {
+        font-size: xx-large;
+        text-decoration: none;
+      }
+
+      .msg-name {
+        font-weight: bold;
+        font-size: smaller;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .msg p {
+        margin-top: 0;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .msg img, .msg video {
+        max-width: 100%;
+        max-height: 400px;
+      }
+
+      img {
+        image-orientation: from-image;
+      }
+
+      audio {
+        max-width: 100%;
+        width: 400px;
+      }
+
+      .multiple-checkmarks {
+        letter-spacing: -0.3em;
+        margin-left: 3px;
+        margin-right: 3px;
+      }
+
+      .msg-img-container input[type=checkbox] {
+        display: none;
+      }
+
+      .msg-img-container img {
+        transition: transform 0.25s ease;
+        cursor: zoom-in;
+      }
+
+      .msg-img-container input[type=checkbox]:checked ~ label > img {
+        transform: scale(2.5);
+        cursor: zoom-out;
+        z-index: 1;
+        position: relative;
+      }
+
+      .msg-reactions {
+        margin-top: 5px;
+        text-align: right;
+      }
+
+      .msg-reaction {
+        padding-left: 8px;
+        padding-right: 8px;
+        background-color: #cccccc;
+        border-radius: 1em;
+        border: 1px solid white;
+        line-height: 150%;
+      }
+
+      .msg-reaction-self {
+        background-color: #aaaaaa;
+      }
+
+      .msg-reaction {
+        position: relative;
+      }
+
+      .msg-reaction .msg-reaction-info {
+        display: block;
+        position: absolute;
+        z-index: 1;
+        visibility: hidden;
+        width: 200px;
+        background-color: #505050;
+        color: white;
+        text-align: center;
+        padding: 5px 0;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 3px;
+        margin-left: -100px;
+        bottom: 125%;
+        left: 50%;
+
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      /* Draw an arrow using border styles */
+      .msg-reaction .msg-reaction-info::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+      }
+
+      .msg-reaction:hover .msg-reaction-info {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .msg-quote {
+        display: flex;
+        width: 98%;
+        background-color: #0008;
+        padding: 5px 5px 5px 0px;
+        border-radius: .3em;
+        margin-bottom: 5px;
+        justify-content: space-between;
+        border-left: 5px solid white;
+      }
+
+      .msg-quote-message {
+        padding-left: 5px;
+      }
+
+      .msg-quote-attach {
+        flex-grow: 1;
+        max-width: 30%;
+      }
+
+      .msg-quote-attach .msg-img-container input[type=checkbox]:checked ~ label > img {
+        transform: scale(5);
+      }
+      .msg-quote-attach img {
+        max-height: 5em;
+      }
+
+      .msg-outgoing .msg-data {
+        text-align: right;
+      }
+
+      .msg-outgoing .msg-reactions {
+        text-align: left;
+      }
+
+      .msg-call-incoming,
+      .msg-call-outgoing,
+      .msg-call-missed,
+      .msg-video-call-incoming,
+      .msg-video-call-outgoing,
+      .msg-video-call-missed,
+      .msg-key-update,
+      .msg-group-update-v1,
+      .msg-group-update-v2,
+      .msg-group-call {
+        background: none;
+        align-self: center;
+      }
+
+      .msg-call-incoming .msg-data,
+      .msg-call-outgoing .msg-data,
+      .msg-call-missed .msg-data,
+      .msg-video-call-incoming .msg-data,
+      .msg-video-call-outgoing .msg-data,
+      .msg-video-call-missed .msg-data,
+      .msg-key-update .msg-data,
+      .msg-group-update-v1 .msg-data,
+      .msg-group-update-v2 .msg-data,
+      .msg-group-call .msg-data {
+        display: block;
+        text-align: center;
+      }
+
+      .msg-group-update-v1, .msg-group-update-v2 {
+        max-width: 80%;
+      }
+
+      .msg-icon {
+        background-repeat: no-repeat;
+        background-size: cover;
+        width: 25px;
+        height: 25px;
+        opacity: 50%;
+        margin: 0 auto;
+        filter: invert(100%);
+        -webkit-filter: invert(100%);
+      }
+
+      .msg-call-missed .msg-icon {
+        background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-missed"><line x1="23" y1="1" x2="17" y2="7"></line><line x1="17" y1="1" x2="23" y2="7"></line><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>');
+      }
+
+      .msg-call-incoming .msg-icon {
+        background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-incoming"><polyline points="16 2 16 8 22 8"></polyline><line x1="23" y1="1" x2="16" y2="8"></line><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>');
+      }
+
+      .msg-call-outgoing .msg-icon {
+        background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-outgoing"><polyline points="23 7 23 1 17 1"></polyline><line x1="16" y1="8" x2="23" y2="1"></line><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>');
+        -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        filter: FlipH;
+        -ms-filter: "FlipH";
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message-header">
+      <div id="thread-title">
+        Amal
+      </div>
+      <div id="thread-subtitle">
+        +12063372556
+      </div>
+    </div>
+    <div class="message-box">
+
+  
+      <div class="msg msg-date-change">
+        <p>
+          Sun, Jul 24, 2022
+        </p>
+  
+      </div>
+
+  
+    
+      <div id="msg-11116" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Hey Amal, here's an album with some videos and photos of rovie that I think you and your kids will enjoy: https://photos.app.goo.gl/7S6ccEizpNe5jrf19
+
+I was putting together a website bringroviehome.com and had paid a video editor today to make a video with pictures and videos with the song I love my dog: https://m.youtube.com/watch?v=uWT2qHVftGk
+
+Thank you so so so much, you are a good person. I promise that we will stay in touch and we can meet up anytime so you guys can play with rovie/Bella :)
+
+Thank you so much again. Have a good night!</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 05:08
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+      <div class="msg msg-date-change">
+        <p>
+          Mon, Jul 25, 2022
+        </p>
+  
+      </div>
+
+  
+    
+      <div id="msg-11350" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>It was my pleasure having Rovie/Bella in my household and my kids were happy to had her in their life I wish you didn't had to pay that dude the $600 because we could have toke the kids and Bella for shopping but guess it was meant for him to get his drugs lol god works mysterious ways. If I ever get extra money I will buy bella name tag and take her for toys shopping that was my plan before she was found by her mommy Jasmine and Daddy and I am happy for my girl to reunited with her family ❤️ plz keep in touch I and the kids grew found of her. Kiss her for us plz and have a wonderful night 💋 and let jasmine know I said hi</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 04:00
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11351" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>It was my pleasure having Rovi in my household and my kids were happy to have her in their life! If I ever get any cash I will buy you and Jasmine the beads and nametag the guy lost. And also, please let Jasmine know I said hi.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 04:07
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11360" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Good morning sweetie how is Bella. OMG my 11year old daughter woke up saying 
+Bella! Bella! Bella! 🤣</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 13:29
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11362" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Aww thank you so much Amal. 
+
+Yeah so I was wondering about that, who is that young man to you? 
+
+He had text me after saying not to say the amount. I actually cashapp him $800 and $200 cash. I thought he was related to you at first. You guys said you know the person that took her? 
+
+He mentioned to me that it was the blue/silver car we had seen on Franklin Ave and posted on the fliers. 
+
+Truthfully even if the police arrest the person that took her they will be let out very quickly anyways, but more than anything I just don't want them to do this to anyone else. 
+
+The last two weeks were extremely difficult for us, we barely slept or ate and we spent a lot of money on a lawyer and fliers and just searching day and night. 
+
+Also my mother was in the hospital from the stress, and she has a thing on her artery that could burst and cause an aneurysm. And ontop of that on Saturday my grandma is in the hospital and she will die soon. 
+
+So yeah, I just want to impress upon this person that what they did hurt us very badly. 
+
+I understand addiction and I know times are very difficult right now, but it is possible to survive and live well in this country with hard work and focus. They don't have to steal from regular people like us, and if they need help to get off drugs there are resources if they really want it. 
+
+I'm sorry, Amal. If I had known I would have made sure you got all of the money, because you are the one that took care of rovie/bella. We are so grateful for that. 
+
+I spent almost all of my money searching for her, but when I get paid again I would like to help you out. I'm not rich by any means, but I make a decent living building websites and apps. 
+
+I will send more pictures of her for your kids, and we can plan for meeting maybe at a park or something so they can play. 
+
+And if you have the information of who took her please do send it, because I would like for them to understand that what they did was like taking our child for us. 
+
+Also, I want to hold the detective accountable, because she ignored me even after we had found that car and when I went to see her in person and hired a lawyer she changed the story of what she saw in the footage.
+
+So please do send me over any names or information you have of who took her from cub foods in Uptown that night. 
+
+Thanks again, Amal. Take care and be whale 🐳 (be well 😁)</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:16
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1010" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658758632388">
+      <label for="zoomCheck-1658758632388">
+        <img src="./attachments/Attachment_876_1658758632388.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:17
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1011" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658758658044">
+      <label for="zoomCheck-1658758658044">
+        <img src="./attachments/Attachment_877_1658758658044.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+        
+        <div>
+        
+          <pre>This is her favorite orange ball she love to play catch.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:17
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1012" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658758697032">
+      <label for="zoomCheck-1658758697032">
+        <img src="./attachments/Attachment_878_1658758697032.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:18
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1013" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658758762155">
+      <label for="zoomCheck-1658758762155">
+        <img src="./attachments/Attachment_879_1658758762155.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+        
+        <div>
+        
+          <pre>This is her "baby" she had since she was a small puppy. Every night before bed she do this.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:19
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11363" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Also yesterday when we walk her we say hey bella and she turn around!!! Now she have two names 😂</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:20
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11364" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Omg i am so sorry</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:22
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1014" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658759049956">
+      <label for="zoomCheck-1658759049956">
+        <img src="./attachments/Attachment_880_1658759049956.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+        
+        <div>
+        
+          <pre>This the car that took her.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:24
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11365" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>He is just somali person nothing to me we only know each other due to them giving me ride one day to cedar and i give them gas money so thats how we know each other and sometimes him amd his girlfriend find me ride they dont have car</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:24
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1015" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658759066648">
+      <label for="zoomCheck-1658759066648">
+        <img src="./attachments/Attachment_881_1658759066648.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:24
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1016" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658759088996">
+      <label for="zoomCheck-1658759088996">
+        <img src="./attachments/Attachment_882_1658759088996.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:24
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1017" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658759103805">
+      <label for="zoomCheck-1658759103805">
+        <img src="./attachments/Attachment_883_1658759103805.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:25
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1018" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658759115862">
+      <label for="zoomCheck-1658759115862">
+        <img src="./attachments/Attachment_884_1658759115862.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:25
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11366" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Ah I see.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:26
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11367" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I am a single mom of 3 kids no drugs addiction just mental health issues</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:26
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11368" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Ah I see. Well the guy who call me yesterday and took most of the money he said it was his friend that took her, and he is addicted to drugs. He also said that blue car was the right one that we had found.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:27
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11369" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I have been in that car with bella i was  sick that day with kidney infection from dehydration and he toke me to that store and i buy her patty with my money he is broke he was asking me gas money</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:28
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11370" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I asked him where he got it he said he buyed from homeless man and then he left her at my house ever since</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:29
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11371" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Also the dude told me you give him $600 and he give me $100 i am sacred of him so i didnt argue with him</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:30
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11372" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>He went and got drugs witg the rest but god is going to reward me so dont worry</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:31
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11373" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I wish you never give him that much</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:31
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11374" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>But bella is worth it</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:31
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11375" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Ah I see. Well to me rovie is priceless. I would have given everything I own if that's what it take.  Some things in life are more important than money.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:32
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11376" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I have no families or true friends here in United States so i get alone with people to avoid trouble</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:32
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11377" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Yes she is</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:33
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11378" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I want my baby back bro lol i miss her and i only spend week with her imagine how you guys felt i am truly sorry</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:34
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11379" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I understand. My mother is from Colombia and she's the only family besides rovie and jasmine that I live with. My father was murdered when I was 11 years old. Sometimes I think I am going to go back to Colombia because I am tired of how things are going here.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:34
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11381" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Live is test and some are harder than other hang in there if i learn anything on my miserable life is that what doesn't kill you makes you stronger</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:37
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11382" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I am sorry for your dad</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:37
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11383" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I was stolen when I was 5 from my mom who was in search for food for me and my little sister then my neighbor who wanted to make me het maid toke me i still remember she pinch me and said if I scream she will kill me and put me on top of a truck that was carrying goats i swear I remember like it was yesterday</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:40
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11384" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Then left Somalia it was 1995 and we come to Kenya in a refugee camps and day one at 5 years old was cooking cleaning no dish washer no cloth machine everything by hand wash cooking with woods</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:42
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1019" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760226793">
+      <label for="zoomCheck-1658760226793">
+        <img src="./attachments/Attachment_885_1658760226793.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:43
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11385" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>She will starve me for days even though I was the one cooking i wasn't allowed to eat or drink and if she see me test a water she will burn me choke me any torture possible i had been to it</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:43
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11386" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Then one luck day we moved to America and she didnt know that you dont abuse kids i will go to elementary school and fall from starvation till the teacher noticed my mealnorishment  and reported to child protection agency and that was 2002 and i for the first time got a mom and home and become child till 2005 when a somali man raped me and got pregnant with my son Zakaria and he is my reason to live life</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:51
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11387" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Bella made my shoulder hurt you know I am old lady i can't be playing around like teen lol she loved Shugri 11 year old daughter second child that was her mom</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:52
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1021" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760853939">
+      <label for="zoomCheck-1658760853939">
+        <img src="./attachments/Attachment_886_1658760853939.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:54
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11388" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>That was her gift from Zack</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:54
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1023" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760899873">
+      <label for="zoomCheck-1658760899873">
+        <img src="./attachments/Attachment_887_1658760899873.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:54
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1025" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760907796">
+      <label for="zoomCheck-1658760907796">
+        <img src="./attachments/Attachment_888_1658760907796.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1027" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760913824">
+      <label for="zoomCheck-1658760913824">
+        <img src="./attachments/Attachment_889_1658760913824.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1029" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760921889">
+      <label for="zoomCheck-1658760921889">
+        <img src="./attachments/Attachment_890_1658760921889.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1031" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760932899">
+      <label for="zoomCheck-1658760932899">
+        <img src="./attachments/Attachment_891_1658760932899.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1033" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760934131">
+      <label for="zoomCheck-1658760934131">
+        <img src="./attachments/Attachment_892_1658760934131.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1035" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760936250">
+      <label for="zoomCheck-1658760936250">
+        <img src="./attachments/Attachment_893_1658760936250.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1037" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760939636">
+      <label for="zoomCheck-1658760939636">
+        <img src="./attachments/Attachment_894_1658760939636.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1039" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760947052">
+      <label for="zoomCheck-1658760947052">
+        <img src="./attachments/Attachment_895_1658760947052.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1041" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658760948853">
+      <label for="zoomCheck-1658760948853">
+        <img src="./attachments/Attachment_896_1658760948853.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:55
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11389" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>My baby girl her name is Nora she is not her she been at my friend house for almost two weeks I been sick in the hospital but boy when she comes back and bella is not her she going to cry she told me not to let her run out or get kidnapped lol sadly she doesn't even know she was taken from her family but Nora is a Dog person and I am not looking forward to explaining where bella went and also Bella was in love with her too</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 14:58
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1043" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658761164880">
+      <label for="zoomCheck-1658761164880">
+        <img src="./attachments/Attachment_897_1658761164880.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:59
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1045" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658761176247">
+      <label for="zoomCheck-1658761176247">
+        <img src="./attachments/Attachment_898_1658761176247.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 14:59
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1047" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658761223737">
+      <label for="zoomCheck-1658761223737">
+        <img src="./attachments/Attachment_899_1658761223737.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 15:00
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11390" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Oh there is a pink collar we borrowed from our neighbor so that's what she is holding on with Nora</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:01
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1049" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658761346595">
+      <label for="zoomCheck-1658761346595">
+        <img src="./attachments/Attachment_900_1658761346595.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 15:02
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11391" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Think of it as a good outcome we got to meet bella and her wonderful parents and you get to meet us not that bad of family lol you won't be disappointed meeting me and my kids I don't know how you feel about getting to know us better and I would love to have another sister to chat with me and Jasmine would one day sit in the front yard bella running around with the kids and we talking about that days she was kidnapped but ended up in a good hands. Just trying to make your days less stress if I been through what you and Jasmine went through I would have not been on planet earth anymore. Not encouraging suicidal at all but you guys been through worse fear a parent can go through ever and bella is just as a kid as My little Nora so I hope you both and mom and grandma all put this behind and feel better. I will pray for all of you guys and I am so thankful God found you guys before the end of the month because I got evicted for none payment and have to move by the end I didn't know where to take her as she became part of my kids my life and I was feeling guilty but God always comes through and I don't care if he toke all the money my bella wasn't for sale I wouldn't have toke it from you but it was meant for him And he won't go far with someone's hard earned money and sweat. But hay you got your baby and that is priceless right</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:14
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1051" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658762243944">
+      <label for="zoomCheck-1658762243944">
+        <img src="./attachments/Attachment_901_1658762243944.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 15:17
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1053" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658762251778">
+      <label for="zoomCheck-1658762251778">
+        <img src="./attachments/Attachment_902_1658762251778.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 25, 15:17
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11392" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Plz don't let anyone know I sent you his license because he is a gang member and I could get killed by his people even the one who called you is his best friend and I honestly think they probably did it for the reward money they knew it that some kind of money was going to be involved</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:19
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11393" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>And then they left her with my naive mind I have a heart that just won't stop caring for people even if they do me worse so that is my theory</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:21
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11394" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I wish I come to talk to you before he did I wouldn't have toke that money infact I was going to pay good person to take her for $100-200 on my childrens lives I was planning that was just waiting to get my son's SSI first 😂</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:23
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11395" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>My daughter shugri said don't leave her with someone who will neglect her and hurt her and that hurt my heart I prayed for someone who will take the responsibility of taking good care of her and he calls me saying I know the owner and they paying $600 but I have to split with you I told him is their dog why would they pay you if anything I feed her and that cause me alot for the past week I deserve it then he lied to me and toke most of it but hey I will do it all over again if I have to what I feed bella is not important to my wallet she is my foster daughter lol since she already has Jasmin I will settle for foster mom. Hey hope your day goes well for all of you I hope Jasmine is happy and hopeom is well I pray for her speedy recovery and happiness. Kiss bella for me</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:29
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11396" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>OMG I can't stop looking at her pictures she tore 5 teddy bears 😂😂 that is Bella I love her sassy personality she grew in me I used to be scared of dogs now I want to come over your house and steal her (good way) you will know where she be.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:48
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11397" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Can you help me find apartment near you guys I honestly don't think I can be with out my baby girl 🤣 boy this is how you guys felt even worse I am million times sorry you had to go through this pain and I hope you guys heal and forgive that evil boy for what he put you on. Forgiveness heals you not for him for yourself to  heal and move on.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 15:52
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+      <div class="msg msg-date-change">
+        <p>
+          Tue, Jul 26, 2022
+        </p>
+  
+      </div>
+
+  
+    
+      <div id="msg-11539" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Hey my brother the guy who stole your dog and the one who toke the reward got into fight because of our bella Rovi and had to be hospitalized for head injury.  Karma is good he ripped me of reward I deserved it since I toke care  my baby b7t gready got the best of them and now they got hurt</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 26, 00:26
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-1055" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+        
+        <div class="attachment">
+    
+    <div class="msg-img-container">
+      <input type="checkbox" id="zoomCheck-1658795287774">
+      <label for="zoomCheck-1658795287774">
+        <img src="./attachments/Attachment_903_1658795287774.bin">
+      </label>
+    </div>
+    
+  </div>
+        
+      
+      
+    
+        <span class="msg-data">Jul 26, 00:27
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11540" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>That is karma for ripping you and me both of</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 26, 00:28
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+    </div>
+  </body>
+</html>

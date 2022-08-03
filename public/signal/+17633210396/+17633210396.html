@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+  <head>
+    <title>Signal2HTML &middot; +17633210396</title>
+    <style>
+
+      body {
+        background-color: #222;
+      }
+
+      #message-header {
+        text-align: center;
+        color: white;
+        font-family: Noto Sans, Liberation Sans, OpenSans, sans-serif;
+        padding-top: 30px;
+        padding-bottom: 30px;
+      }
+
+      #thread-title {
+        font-size: x-large;
+      }
+
+      .message-box {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        margin: 0 auto;
+        padding-left: 30px;
+        padding-right: 30px;
+        background-color: #282828;
+        color: white;
+        font-family: Noto Sans, Liberation Sans, OpenSans, sans-serif;
+        border-radius: 10px;
+      }
+
+      .msg-incoming {
+        align-self: flex-start;
+        background: teal;
+      }
+
+      .msg-sender-0 { /* recipient id:   429 */ background: #C73800;}
+
+
+      .msg-outgoing {
+        align-self: flex-end;
+        background: #555;
+      }
+
+      .msg {
+        max-width: 50%;
+        border-radius: .4em;
+        margin: 15px 0;
+        padding: 10px;
+      }
+
+      .msg pre {
+        font-family: Noto Sans, Liberation Sans, OpenSans, sans-serif;
+        white-space: pre-wrap;
+        margin-top: 0px;
+        margin-bottom: 5px;
+      }
+
+      .msg pre a {
+        color: white;
+        text-decoration: underline;
+      }
+
+      .msg-data {
+        font-size: x-small;
+        opacity: 50%;
+        display: block;
+      }
+
+      .msg-emoji {
+        font-family: Noto Color Emoji, sans-serif;
+      }
+
+      .msg-all-emoji {
+        font-size: xx-large;
+      }
+
+      .msg-mention {
+        background-color: #00000060;
+      }
+
+      .msg-date-change {
+        font-size: x-small;
+        opacity: 50%;
+        align-self: center;
+      }
+
+      .msg-dl-link a {
+        font-size: xx-large;
+        text-decoration: none;
+      }
+
+      .msg-name {
+        font-weight: bold;
+        font-size: smaller;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .msg p {
+        margin-top: 0;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .msg img, .msg video {
+        max-width: 100%;
+        max-height: 400px;
+      }
+
+      img {
+        image-orientation: from-image;
+      }
+
+      audio {
+        max-width: 100%;
+        width: 400px;
+      }
+
+      .multiple-checkmarks {
+        letter-spacing: -0.3em;
+        margin-left: 3px;
+        margin-right: 3px;
+      }
+
+      .msg-img-container input[type=checkbox] {
+        display: none;
+      }
+
+      .msg-img-container img {
+        transition: transform 0.25s ease;
+        cursor: zoom-in;
+      }
+
+      .msg-img-container input[type=checkbox]:checked ~ label > img {
+        transform: scale(2.5);
+        cursor: zoom-out;
+        z-index: 1;
+        position: relative;
+      }
+
+      .msg-reactions {
+        margin-top: 5px;
+        text-align: right;
+      }
+
+      .msg-reaction {
+        padding-left: 8px;
+        padding-right: 8px;
+        background-color: #cccccc;
+        border-radius: 1em;
+        border: 1px solid white;
+        line-height: 150%;
+      }
+
+      .msg-reaction-self {
+        background-color: #aaaaaa;
+      }
+
+      .msg-reaction {
+        position: relative;
+      }
+
+      .msg-reaction .msg-reaction-info {
+        display: block;
+        position: absolute;
+        z-index: 1;
+        visibility: hidden;
+        width: 200px;
+        background-color: #505050;
+        color: white;
+        text-align: center;
+        padding: 5px 0;
+        border-color: white;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 3px;
+        margin-left: -100px;
+        bottom: 125%;
+        left: 50%;
+
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      /* Draw an arrow using border styles */
+      .msg-reaction .msg-reaction-info::before {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+      }
+
+      .msg-reaction:hover .msg-reaction-info {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .msg-quote {
+        display: flex;
+        width: 98%;
+        background-color: #0008;
+        padding: 5px 5px 5px 0px;
+        border-radius: .3em;
+        margin-bottom: 5px;
+        justify-content: space-between;
+        border-left: 5px solid white;
+      }
+
+      .msg-quote-message {
+        padding-left: 5px;
+      }
+
+      .msg-quote-attach {
+        flex-grow: 1;
+        max-width: 30%;
+      }
+
+      .msg-quote-attach .msg-img-container input[type=checkbox]:checked ~ label > img {
+        transform: scale(5);
+      }
+      .msg-quote-attach img {
+        max-height: 5em;
+      }
+
+      .msg-outgoing .msg-data {
+        text-align: right;
+      }
+
+      .msg-outgoing .msg-reactions {
+        text-align: left;
+      }
+
+      .msg-call-incoming,
+      .msg-call-outgoing,
+      .msg-call-missed,
+      .msg-video-call-incoming,
+      .msg-video-call-outgoing,
+      .msg-video-call-missed,
+      .msg-key-update,
+      .msg-group-update-v1,
+      .msg-group-update-v2,
+      .msg-group-call {
+        background: none;
+        align-self: center;
+      }
+
+      .msg-call-incoming .msg-data,
+      .msg-call-outgoing .msg-data,
+      .msg-call-missed .msg-data,
+      .msg-video-call-incoming .msg-data,
+      .msg-video-call-outgoing .msg-data,
+      .msg-video-call-missed .msg-data,
+      .msg-key-update .msg-data,
+      .msg-group-update-v1 .msg-data,
+      .msg-group-update-v2 .msg-data,
+      .msg-group-call .msg-data {
+        display: block;
+        text-align: center;
+      }
+
+      .msg-group-update-v1, .msg-group-update-v2 {
+        max-width: 80%;
+      }
+
+      .msg-icon {
+        background-repeat: no-repeat;
+        background-size: cover;
+        width: 25px;
+        height: 25px;
+        opacity: 50%;
+        margin: 0 auto;
+        filter: invert(100%);
+        -webkit-filter: invert(100%);
+      }
+
+      .msg-call-missed .msg-icon {
+        background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-missed"><line x1="23" y1="1" x2="17" y2="7"></line><line x1="17" y1="1" x2="23" y2="7"></line><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>');
+      }
+
+      .msg-call-incoming .msg-icon {
+        background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-incoming"><polyline points="16 2 16 8 22 8"></polyline><line x1="23" y1="1" x2="16" y2="8"></line><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>');
+      }
+
+      .msg-call-outgoing .msg-icon {
+        background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-phone-outgoing"><polyline points="23 7 23 1 17 1"></polyline><line x1="16" y1="8" x2="23" y2="1"></line><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>');
+        -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        filter: FlipH;
+        -ms-filter: "FlipH";
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message-header">
+      <div id="thread-title">
+        +17633210396
+      </div>
+      <div id="thread-subtitle">
+        +17633210396
+      </div>
+    </div>
+    <div class="message-box">
+
+  
+      <div class="msg msg-date-change">
+        <p>
+          Sun, Jul 24, 2022
+        </p>
+  
+      </div>
+
+  
+    
+      <div id="msg-11003" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Hey it's me</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:29
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11007" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Is your phone number your cashapp</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:30
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11011" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Yes</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:30
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11012" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>$Subtlefugetive</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:31
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11014" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>https://cash.app/$subtlefugetive</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:31
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11015" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>650 cashapp cool and the rest cash?</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:32
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11016" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Or I can do it all cashapp up to you</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:32
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11017" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Yeah that works </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:32
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11018" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Okay cool I'm going to ATM now and then coming</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:32
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11020" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Ok </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:32
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11022" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>You don't have to send it now </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:32
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11023" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Just so I can remember it </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:33
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11024" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Omg man bro you have no idea how happy this is going to make us. You got a friend for life if you want it bro.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:33
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11025" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Of course bro </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:35
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11026" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I just built a pc 2 years ago and it crapped out </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:35
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11027" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Guess why </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:35
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11028" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>A fucking cockroach got in and fried everything </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:35
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11029" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Omg dude last night I heard noise from my new computer I just showed u in the fans</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:36
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11030" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I was like wtf is that, it was a damn bug in there!</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:37
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11032" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I been so devastated I haven't put the sides on or organized the wires</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:37
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11033" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I got a gaming laptop if you need a new computer</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:37
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11034" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>It's an Asus zephyrus g15</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:37
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11035" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Has a 1070 GTX. It's from 2019 so not the newest but still worth like 800 easily. Don't worry I got the cash for you also, but if you need a computer I can help you since I just upgraded</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:38
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11036" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Id have to format it but if you want it I can sell it to you for real cheap, like 200-300 or something. We'll talk about that later, for now I got a grand for you.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:40
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11037" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I'm almost there on 94 now</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:40
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11038" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>It won't work at all </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:41
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11039" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>But guess what </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11040" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I literally have the dudes id who stole her from you</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11041" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>My girl has my card so she's pulling the 350 now and I got 650 in cashapp.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11042" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Honestly man just tell them not to do that shit cause it's like taking a child</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11043" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I can help y'all make money legit</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11044" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I been coding for 15 years</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11045" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>That's why I wouldn't let him just sell her on the street </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:42
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11046" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Thank you so much man</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:43
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11047" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>He legit wanted to go to a liquor store and sell her to the highest bidder and once I told my mom she went crazy on him </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:43
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11048" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>And took her in as her own </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:43
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11049" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Till we found you guys </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:43
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11050" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>I had a Facebook post up and something on Twitter looking for you guys </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:44
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11051" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Wow man, thank you so much. I'm about to pull up.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:44
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11052" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Is your girlfriend with you </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:44
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11053" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Let me call my girl to see where she at</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:44
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11054" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>My girl is at the ATM and I'm with her friend</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:45
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11059" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Are you here </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:45
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11060" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Yeah</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:45
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11061" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Fuck ATM max is $200 I'll cashapp $800?</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 02:45
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11078" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Don't tell anyone how much it was </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 03:19
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11082" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>You good man, I'm just happy to have my baby back.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 03:50
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+    
+      <div id="msg-11083" class="msg msg-outgoing msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>She's worth all the money in the world to me. Take care and stay safe man.</pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 24, 03:50
+  
+    &#x1f513;&#xfe0e;
+  
+  
+    &#x2713;
+  </span>
+    
+  
+      </div>
+
+  
+      <div class="msg msg-date-change">
+        <p>
+          Mon, Jul 25, 2022
+        </p>
+  
+      </div>
+
+  
+    
+      <div id="msg-11401" class="msg msg-incoming msg-sender-0">
+      
+      
+      
+      
+        
+        <div>
+        
+          <pre>Did you tell the woman that's been calling you how much you gave me </pre>
+        </div>
+      
+    
+        <span class="msg-data">Jul 25, 17:23
+  
+    &#x1f513;&#xfe0e;
+  
+  </span>
+    
+  
+      </div>
+
+    </div>
+  </body>
+</html>

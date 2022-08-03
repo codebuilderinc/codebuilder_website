@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/digitalnomad91
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://codebuilder.us
+  * I am digitalnomad91 (https://keybase.io/digitalnomad91) on keybase.
+  * I have a public key ASCbO5_v6D3jxjhNRZvei3qrZ4Cq-JEIYoujEvt8f848NAo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "01209b3b9fefe83de3c6384d459bde8b7aab6780aaf89108628ba312fb7c7fce3c340a",
+      "host": "keybase.io",
+      "kid": "01209b3b9fefe83de3c6384d459bde8b7aab6780aaf89108628ba312fb7c7fce3c340a",
+      "uid": "3d392aa1bac85e716f3919cf59e83f19",
+      "username": "digitalnomad91"
+    },
+    "merkle_root": {
+      "ctime": 1643529180,
+      "hash": "6cf8a1d85489e560dfbe0faa4827549dc948568ac58f081b27178e4ab75d50f18862269f3f0dc0c5340a2909cb30b5ae302081702f20bd6bd55576bf56e68f05",
+      "hash_meta": "2bf5ce8a41a7bd52b0a73405b71e6e98339cb359c5988e353607ff78d568398f",
+      "seqno": 21754710
+    },
+    "service": {
+      "entropy": "hCJa0D9b8fNXZnr/Wr1Qo26t",
+      "hostname": "codebuilder.us",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "5.9.0"
+  },
+  "ctime": 1643529212,
+  "expire_in": 504576000,
+  "prev": "81fe5c57680ab9cfb6cde88eb1e75f6a258ce8e42133721c50be4ed5bde3d170",
+  "seqno": 34,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgmzuf7+g948Y4TUWb3ot6q2eAqviRCGKLoxL7fH/OPDQKp3BheWxvYWTESpcCIsQggf5cV2gKuc+2zeiOsedfaiWM6OQhM3IcUL5O1b3j0XDEIEo2yA+Ju5x2iY2PtqNU116VaDobl2B+rWv48FUYl+LuAgHCo3NpZ8RAZxG7HkOrBIbQFNaX4yg8/nH+Sr3GsDdkEbo/ILOOqxa/w9IBIoX+PoFxrJKwT4MB9p7cqbJPXrpocf9Xr9d4B6hzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIFZCHEf0ByU6t5T1f0VRW4zIx34xo1094AOwgaq5DbtIo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/digitalnomad91
+
+==================================================================
